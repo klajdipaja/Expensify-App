@@ -35,6 +35,7 @@ const getConfiguration = (environment: Environment): Promise<Configuration> =>
             mode: 'development',
             devtool: 'eval-source-map',
             devServer: {
+                allowedHosts: 'all',
                 static: {
                     directory: path.join(__dirname, '../../dist'),
                 },
@@ -45,7 +46,7 @@ const getConfiguration = (environment: Environment): Promise<Configuration> =>
                 ...proxySettings,
                 historyApiFallback: true,
                 port,
-                host: 'dev.new.expensify.com',
+                host: '0.0.0.0',
                 server: {
                     type: 'https',
                     options: {

@@ -37,7 +37,6 @@
 # ./scriptname.sh YOUR_MAPBOX_ACCESS_TOKEN
 
 # Use functions and variables from the utils script
-source scripts/shellUtils.sh
 
 NETRC_PATH="$HOME/.netrc"
 GRADLE_PROPERTIES_PATH="$HOME/.gradle/gradle.properties"
@@ -47,7 +46,6 @@ GRADLE_PROPERTIES_PATH="$HOME/.gradle/gradle.properties"
 handleError() {
     echo -e "\n"
     
-    error "The script failed."
     echo "The most probable reason is permissions."
     echo -e "Please ensure you have read/write permissions for the following:\n"
     

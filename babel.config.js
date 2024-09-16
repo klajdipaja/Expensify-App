@@ -41,6 +41,18 @@ if (!process.env.ELECTRON_ENV && process.env.npm_lifecycle_event !== 'desktop') 
 const webpack = {
     presets: defaultPresets,
     plugins: defaultPlugins,
+    sourceType: 'unambiguous',
+
+    env: {
+        production: {
+            presets: defaultPresets,
+            plugins: [...defaultPlugins, 'transform-remove-console'],
+        },
+        development: {
+            presets: defaultPresets,
+            plugins: defaultPlugins,
+        },
+    },
 };
 
 const metro = {
