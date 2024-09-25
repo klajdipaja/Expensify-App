@@ -36,6 +36,8 @@ import FloatingMessageCounter from './FloatingMessageCounter';
 import getInitialNumToRender from './getInitialNumReportActionsToRender';
 import ListBoundaryLoader from './ListBoundaryLoader';
 import ReportActionsListItemRenderer from './ReportActionsListItemRenderer';
+import {OnyxInputOrEntry} from "@src/types/onyx";
+import ReportAction from "../../../types/onyx/ReportAction";
 
 type LoadNewerChats = DebouncedFunc<(params: {distanceFromStart: number}) => void>;
 
@@ -338,11 +340,27 @@ function ReportActionsList({
         // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     }, []);
 
+    const isWhisperVisibleOnlyToUser =
+        (reportAction: OnyxInputOrEntry<ReportAction>) => {
+            const whisperedTo = ReportActionsUtils.getWhisperedTo(reportAction);
+
+            const iouReportID =
+                ReportActionsUtils.isMoneyRequestAction(reportAction) && ReportActionsUtils.getOriginalMessage(reportAction)?.IOUReportID
+                    ? (ReportActionsUtils.getOriginalMessage(reportAction)?.IOUReportID ?? '').toString()
+                    : '-1';
+            const transactionsWithReceipts = ReportUtils.getTransactionsWithReceipts(iouReportID);
+            const isWhisper = whisperedTo.length > 0 && transactionsWithReceipts.length === 0;
+            return isWhisper && ReportUtils.isCurrentUserTheOnlyParticipant(whisperedTo);
+        }
+
     const scrollToBottomForCurrentUserAction = useCallback(
         (isFromCurrentUser: boolean) => {
-            // If a new comment is added and it's from the current user scroll to the bottom otherwise leave the user positioned where
+            const isWhisperOnlyVisibleByUser = isWhisperVisibleOnlyToUser(sortedVisibleReportActions[0]);
+
+            // If a new comment is added and it's from the current user or it is a whisper for the current user then scroll to the bottom otherwise leave the user positioned where
             // they are now in the list.
-            if (!isFromCurrentUser) {
+            const shouldScrollDown = isFromCurrentUser || isWhisperOnlyVisibleByUser;
+            if (!shouldScrollDown) {
                 return;
             }
             if (!hasNewestReportActionRef.current) {
